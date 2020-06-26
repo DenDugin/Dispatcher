@@ -20,19 +20,28 @@ public class RabbitConfiguration {
     private String exchange;
 
 
+    @Value("${rabbitmq.host}")
+    private String rabbitHost;
+
+    @Value("${rabbitmq.user}")
+    private String user;
+
+    @Value("${rabbitmq.password}")
+    private String password;
+
+
     //настраиваем соединение с RabbitMQ
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitHost);
+        connectionFactory.setUsername(user);
+        connectionFactory.setPassword(password);
+        connectionFactory.setConnectionTimeout(50000);
+
         // connectionFactory.setRequestedHeartBeat(60);
         return connectionFactory;
     }
 
-//    @Bean
-//    public AmqpAdmin amqpAdmin() {
-//        RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory());
-//        return rabbitAdmin;
-//    }
 
     @Bean
     public MessageConverter jsonMessageConverter(){
@@ -47,47 +56,6 @@ public class RabbitConfiguration {
         rabbitTemplate.setReplyTimeout(10000);
         return rabbitTemplate;
     }
-
-
-//    //объявляем очередь с именем queue1
-//    @Bean
-//    public Queue myQueue1() {
-//        return new Queue("query-example-4-1");
-//    }
-//
-//
-//    @Bean
-//    public Queue myQueue2() {
-//        return new Queue("query-example-4-2");
-//    }
-//
-//
-//    @Bean
-//    public DirectExchange directExchange(){
-//        return new DirectExchange("exchange-example-4");
-//    }
-//
-//
-//    @Bean
-//    public Binding errorBinding1(){
-//        return BindingBuilder.bind(myQueue1()).to(directExchange()).with("error");
-//    }
-//
-//    @Bean
-//    public Binding errorBinding2(){
-//        return BindingBuilder.bind(myQueue2()).to(directExchange()).with("error");
-//    }
-//
-//
-//    @Bean
-//    public Binding infoBinding(){
-//        return BindingBuilder.bind(myQueue2()).to(directExchange()).with("info");
-//    }
-//
-//    @Bean
-//    public Binding warningBinding(){
-//        return BindingBuilder.bind(myQueue2()).to(directExchange()).with("warning");
-//    }
 
 
 

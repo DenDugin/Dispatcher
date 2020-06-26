@@ -1,18 +1,21 @@
 package com.dispatcher.dispatcher.controller;
 
+import com.dispatcher.dispatcher.component.Docker;
 import com.dispatcher.dispatcher.component.Sender;
 import com.dispatcher.dispatcher.entity.Message;
 import com.dispatcher.dispatcher.entity.Order;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.amqp.AmqpIOException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,6 +28,12 @@ public class MainController {
 
     @Autowired
     private Sender sender;
+
+    @Autowired
+    private Docker docker;
+
+    @Value("${rabbitmq.image}")
+    private String image;
 
     private int max_dispatcher = 100;
 
@@ -42,35 +51,34 @@ public class MainController {
 
 
     @PostMapping(value = "/dispatcher", consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<Integer> geMessage(@RequestBody String message) throws InterruptedException {
+    public ResponseEntity<Integer> geMessage(@RequestBody String message) throws Exception {
 
         Integer id_dispt = blockingQueue.take();
 
-         es.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    XmlMapper xmlMapper = new XmlMapper();
-                    Message readValue = xmlMapper.readValue(message, Message.class);
+         es.submit(() -> {
+             try {
+                 XmlMapper xmlMapper = new XmlMapper();
+                 Message readValue = xmlMapper.readValue(message, Message.class);
 
-//                    System.out.println(readValue.getId());
-//                    System.out.println(readValue.getData());
+                 Order order = new Order(readValue.getId(), id_dispt, readValue.getData(),readValue.getClient_id());
 
-                    Order order = new Order(readValue.getId(), id_dispt, readValue.getData(),readValue.getClient_id());
+                 sender.sendToRabbit(order);
 
-                    sender.sendToRabbit(order);
-
-                    //Sender.sendPost(order);
-                    //  Thread.sleep(15000);
-                    // запуск исполнителя
-                   // System.out.println(id_dispt);
-                   // return id_dispt;
-
-                } catch (Exception e) {
-                   // return null;
-                }
-            }
-        });
+             } catch (AmqpIOException ex) {
+                 if ( ex.getCause() instanceof SocketTimeoutException | ex.getCause() instanceof NoRouteToHostException) {
+                     try {
+                         docker.startContainer(image);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     // throw new ConnectionTryException(ex.getMessage(),ex.getCause());
+                 }
+                 ex.printStackTrace();
+             }
+             catch (Exception ex) {
+                 ex.printStackTrace();
+             }
+         });
 
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
@@ -83,6 +91,8 @@ public class MainController {
 
 
 
+
+    // Если необходим ответ от исполнителя или дождаться отправки сообщения исполнителю и затем отправить ответ клиенту
     @PostMapping(value = "/disp/{id}", consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<Integer> getMessage2(@RequestBody String message, @PathVariable Integer id) throws InterruptedException, ExecutionException {
 
