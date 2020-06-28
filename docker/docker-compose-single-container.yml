@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+
+  disp:
+     container_name: dispatcher
+     build: ./Dispatcher
+     ports:
+      - "8080:8080"
+     image: dispatcher
+     container_name: dispatcher
+     networks:
+      - app-tier
+
+
+  java:
+     container_name: executor
+     volumes:
+      - ./Save/id_1:/id_1
+      - ./Save/id_2:/id_2
+     build: ./Executor
+     ports:
+      - "8081:8081"
+     image: executor
+     container_name: executor
+     networks:
+      - app-tier

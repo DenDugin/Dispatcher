@@ -10,7 +10,7 @@ public class Order implements Serializable {
     private Integer target_id;
     private Integer dispatched_id;
     private  String data;
-    private Integer clinet_id;
+    private Integer client_id;
 
     public Order() {
     }
@@ -19,7 +19,7 @@ public class Order implements Serializable {
         this.target_id = target_id;
         this.dispatched_id = dispatched_id;
         this.data = data;
-        this.clinet_id = clinet_id;
+        this.client_id = clinet_id;
     }
 
     public Integer getTarget_id() {
@@ -34,8 +34,8 @@ public class Order implements Serializable {
         return data;
     }
 
-    public Integer getClinet_id() {
-        return clinet_id;
+    public Integer getClient_id() {
+        return client_id;
     }
 
 
@@ -55,7 +55,7 @@ public class Order implements Serializable {
     }
 
     @XmlElement
-    public void setClinet_id(Integer clinet_id) {
-        this.clinet_id = clinet_id;
+    public void setClient_id(Integer client_id) {
+        this.client_id = client_id;
     }
 }

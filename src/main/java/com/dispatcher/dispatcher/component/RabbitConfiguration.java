@@ -34,10 +34,9 @@ public class RabbitConfiguration {
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitHost);
-        connectionFactory.setUsername(user);
-        connectionFactory.setPassword(password);
+//        connectionFactory.setUsername(user);
+//        connectionFactory.setPassword(password);
         connectionFactory.setConnectionTimeout(50000);
-
         // connectionFactory.setRequestedHeartBeat(60);
         return connectionFactory;
     }

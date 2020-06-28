@@ -35,7 +35,7 @@ public class Sender {
 
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
             Date date = new Date();
-            System.out.println("Response sendToRabbit :" + dateFormat.format(date));
+            System.out.println("sendToRabbit :" + dateFormat.format(date));
 
 
     }

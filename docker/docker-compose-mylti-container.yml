@@ -1,0 +1,80 @@
+version: '3.3'
+
+services:
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+
+  disp:
+     container_name: dispatcher
+     build: ./Dispatcher
+     ports:
+      - "8080:8080"
+     image: dispatcher
+     container_name: dispatcher
+     networks:
+      - app-tier
+
+
+  java:
+     container_name: executor
+     volumes:
+      - ./Save/id_1:/id_1
+     build: ./Executor
+     ports:
+      - "8081:8081"
+     image: executor
+     container_name: executor
+     networks:
+      - app-tier
+
+  java2:
+     container_name: executor2
+     volumes:
+      - ./Save/id_2:/id_2
+     build: ./Executor2
+     ports:
+      - "8082:8082"
+     image: executor2
+     container_name: executor2
+     networks:
+      - app-tier
+
+  java3:
+     container_name: executor3
+     volumes:
+      - ./Save/id_3:/id_3
+     build: ./Executor3
+     ports:
+      - "8083:8083"
+     image: executor3
+     container_name: executor3
+     networks:
+      - app-tier
+
+  java4:
+     container_name: executor4
+     volumes:
+      - ./Save/id_4:/id_4
+     build: ./Executor4
+     ports:
+      - "8084:8084"
+     image: executor4
+     container_name: executor4
+     networks:
+      - app-tier
+
+  java5:
+     container_name: executor5
+     volumes:
+      - ./Save/id_5:/id_5
+     build: ./Executor5
+     ports:
+      - "8085:8085"
+     image: executor5
+     container_name: executor5
+     networks:
+      - app-tier
