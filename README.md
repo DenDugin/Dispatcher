@@ -21,7 +21,7 @@ ENTRYPOINT ["java","-jar","dispatcher.jar"]
 
 RabbitMQ
 
-**Link** :  docker push denisdugin/myrabbitmq:latest
+**Link dockerhub** :  docker push denisdugin/myrabbitmq:latest
 
 
 **Dispatcher API** : 
