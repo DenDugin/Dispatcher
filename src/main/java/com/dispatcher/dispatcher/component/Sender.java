@@ -27,7 +27,7 @@ public class Sender {
     public void sendToRabbit( Message message ) {
 
             // Если необходим ответ от Executor-а :
-            // template.convertSendAndReceive("id_1", order);
+            // template.convertSendAndReceive("id_1", message);
 
             template.convertAndSend(mapRoutKey.get(message.getTarget_id()), message);
 

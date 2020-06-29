@@ -17,7 +17,6 @@ public class RabbitConfiguration {
     @Value("${rabbitmq.exchange}")
     private String exchange;
 
-
     @Value("${rabbitmq.host}")
     private String rabbitHost;
 
