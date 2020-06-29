@@ -42,7 +42,7 @@ public class AppExceptionsHandler {
 
 
     @ExceptionHandler
-    public ResponseEntity<ErrorMessage> handleException(Exception exc) {
+    public ResponseEntity<ErrorMessage> handleException(RuntimeException exc) {
 
         ErrorMessage errorResponse = new ErrorMessage();
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());

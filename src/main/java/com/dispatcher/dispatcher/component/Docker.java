@@ -1,5 +1,7 @@
 package com.dispatcher.dispatcher.component;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -10,17 +12,16 @@ import java.io.InputStreamReader;
 @Component
 public class Docker {
 
-    public void startDockerCompose() {
+    Logger logger =  LogManager.getLogger();
+
+    public synchronized void startDockerCompose() {
 
         try {
             Process p = Runtime.getRuntime().exec("docker-compose up --build");
             p.waitFor();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException | InterruptedException e) {
+            logger.error(e.getMessage(),e); }
     }
 
     public synchronized void startContainer(String image) throws IOException {
@@ -43,7 +44,7 @@ public class Docker {
             p.waitFor();
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
     }
 

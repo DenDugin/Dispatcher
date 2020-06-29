@@ -3,8 +3,10 @@ package com.dispatcher.dispatcher.controller;
 import com.dispatcher.dispatcher.component.Docker;
 import com.dispatcher.dispatcher.component.Sender;
 import com.dispatcher.dispatcher.entity.Message;
-import com.dispatcher.dispatcher.entity.Order;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpIOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,18 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.*;
 
+
 @RestController
-//@Scope(value = "request")
 @RequestMapping("/api")
 public class MainController {
 
@@ -36,62 +34,63 @@ public class MainController {
     @Value("${rabbitmq.image}")
     private String image;
 
-    Logger logger = Logger.getLogger(MainController.class);
+    Logger logger =  LogManager.getLogger();
 
     private int max_dispatcher = 100;
 
-    private final ExecutorService es = Executors.newFixedThreadPool(max_dispatcher);   // ограничиваем число запросов к сервису
+    private final ExecutorService es = Executors.newFixedThreadPool(max_dispatcher);
 
-    private BlockingQueue<Integer> blockingQueue;
+    private BlockingQueue<Integer> idQueue;
 
     public MainController() throws InterruptedException {
 
-        blockingQueue = new ArrayBlockingQueue<>(max_dispatcher);
+        idQueue = new ArrayBlockingQueue<>(max_dispatcher);
 
         for (int i=1; i<=max_dispatcher; i++)
-            blockingQueue.put(i);
+            idQueue.put(i);
     }
 
 
     @PostMapping(value = "/dispatcher", consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<Integer> geMessage(@RequestBody String message) throws Exception {
 
-        Integer id_dispt = blockingQueue.take();
+        Integer id_dispt = idQueue.take();
 
+
+      // т.к. необходимо моментально принять и ответить на сообщение, то формируем пул потоков для создания заказа и отправки его исполнителю
          es.submit(() -> {
              try {
                  XmlMapper xmlMapper = new XmlMapper();
                  Message readValue = xmlMapper.readValue(message, Message.class);
 
-                 Order order = new Order(readValue.getId(), id_dispt, readValue.getData(),readValue.getClient_id());
+                 if ( readValue == null ) throw new RuntimeException("Message is null");
 
-                 sender.sendToRabbit(order);
+                 readValue.setDispatched_id(id_dispt);
+
+                 sender.sendToRabbit(readValue);
 
              } catch (AmqpIOException ex) {
                  if ( ex.getCause() instanceof SocketTimeoutException | ex.getCause() instanceof NoRouteToHostException) {
                      try {
                          docker.startContainer(image);
                      } catch (IOException e) {
-                         e.printStackTrace();
+                         logger.error(e.getMessage(),e);
                      }
                      // throw new ConnectionTryException(ex.getMessage(),ex.getCause());
                  }
-                 ex.printStackTrace();
+                 logger.error(ex.getMessage(),ex);
              }
              catch (Exception ex) {
-                 ex.printStackTrace();
+                 logger.error(ex.getMessage(),ex);
              }
          });
 
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = new Date();
-        logger.info("geMessage :" + dateFormat.format(date));
+        logger.info("geMessage");
 
-        blockingQueue.put(id_dispt);
+        idQueue.put(id_dispt);
         return new ResponseEntity<Integer>(id_dispt, HttpStatus.OK);
     }
-
 
 
 
@@ -99,7 +98,7 @@ public class MainController {
     @PostMapping(value = "/disp/{id}", consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<Integer> waitMessage(@RequestBody String message, @PathVariable Integer id) throws InterruptedException, ExecutionException {
 
-        Integer id_dispt = blockingQueue.take();
+        Integer id_dispt = idQueue.take();
 
         Future<Integer> result = es.submit(new Callable<Integer>() {
 
@@ -109,13 +108,14 @@ public class MainController {
                     XmlMapper xmlMapper = new XmlMapper();
                     Message readValue = xmlMapper.readValue(message, Message.class);
 
-                    Order order = new Order(readValue.getId(), id_dispt, readValue.getData(),readValue.getClient_id());
+                    readValue.setDispatched_id(id_dispt);
 
-                    sender.sendToRabbit(order);
+                    sender.sendToRabbit(readValue);
 
                     return id_dispt;
 
                 } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
                     return null;
                 }
             }
@@ -124,11 +124,9 @@ public class MainController {
 
         result.get();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = new Date();
-        logger.info("geMessage :" + dateFormat.format(date));
+        logger.info("waitMessage");
 
-        blockingQueue.put(id_dispt);
+        idQueue.put(id_dispt);
         return new ResponseEntity<Integer>(id_dispt, HttpStatus.OK);
     }
 
