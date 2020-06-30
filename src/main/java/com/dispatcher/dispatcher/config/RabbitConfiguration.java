@@ -1,4 +1,4 @@
-package com.dispatcher.dispatcher.component;
+package com.dispatcher.dispatcher.config;
 
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;

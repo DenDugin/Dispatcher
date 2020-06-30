@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @XmlRootElement
-public class Message  implements Serializable {
+public class Message implements Serializable {
 
     private Integer target_id;
     private String data;

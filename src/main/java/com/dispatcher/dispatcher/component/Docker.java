@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 @Component
 public class Docker {
 
-    Logger logger =  LogManager.getLogger();
+    private Logger logger =  LogManager.getLogger();
 
     public synchronized void startDockerCompose() {
 

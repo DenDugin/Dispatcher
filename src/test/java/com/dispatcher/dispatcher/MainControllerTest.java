@@ -2,8 +2,8 @@ package com.dispatcher.dispatcher;
 
 
 import com.dispatcher.dispatcher.component.Docker;
-import com.dispatcher.dispatcher.component.RabbitConfiguration;
-import com.dispatcher.dispatcher.component.Sender;
+import com.dispatcher.dispatcher.config.RabbitConfiguration;
+import com.dispatcher.dispatcher.service.serviceImpl.SenderImpl;
 import com.dispatcher.dispatcher.controller.MainController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @TestPropertySource(locations="classpath:application.properties")
-@ContextConfiguration(classes = {MainController.class, Docker.class,Sender.class, RabbitConfiguration.class})
+@ContextConfiguration(classes = {MainController.class, Docker.class, SenderImpl.class, RabbitConfiguration.class})
 @RunWith(SpringRunner.class)
 @WebMvcTest(MainController.class)
 public class MainControllerTest {
