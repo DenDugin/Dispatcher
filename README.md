@@ -29,13 +29,13 @@ RabbitMQ
 POST /api/dispatcher  
 consumes = APPLICATION_XML_VALUE    
 Пример входящего XML :    
-<message>  
-<target_id>1</target_id>  
-<data>TAXI</data>  
-<dispatched_id>1</dispatched_id>  
-<client_id>123</client_id>  
-</message>  
-
+```xml
+<Message>
+<target_id>4</target_id>
+<data>Need taxi</data>
+<client_id>345</client_id>
+</Message>
+```
 
 **Достоинства :**
 - Реализованы несколько типов доставки сообщений (снхронный и аснихронный).   
