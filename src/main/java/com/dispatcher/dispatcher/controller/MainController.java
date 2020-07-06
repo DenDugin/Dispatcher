@@ -39,15 +39,21 @@ public class MainController {
 
         Integer id_dispt = idQueue.take();
 
-        // т.к. необходимо моментально принять и ответить на сообщение, то формируем пул потоков для создания заказа и отправки его исполнителю
-         sender.sendToRabbit(id_dispt, message);
+// 1)        т.к. необходимо моментально принять и ответить на сообщение, то формируем пул потоков для создания заказа и отправки его исполнителю
+          sender.sendToRabbit(id_dispt, message);
 
-        // Если необходим ответ от исполнителя или дождаться отправки сообщения исполнителю и затем отправить ответ клиенту
-//         Future<Boolean> futureResult =  sender.sendToRabbitAndWait(id_dispt, message);
-//         if (!futureResult.get()) {
-//             logger.info( "Message don't send");
-//             throw new RuntimeException("Message don't send");
-//         }
+
+// 2)      Если необходим ответ от исполнителя или дождаться отправки сообщения исполнителю и затем отправить ответ клиенту
+//         Future<Boolean> futureResult = sender.sendToRabbitAndWait(id_dispt, message);
+//        if (!futureResult.get()) {
+//            logger.info( "Message don't send");
+//            throw new RuntimeException("Message don't send");
+//        }
+
+
+// 3)   обычный метод отправки данных
+//        sender.sendToRabbitData(id_dispt, message);
+
         logger.info("geMessage");
 
         idQueue.put(id_dispt);

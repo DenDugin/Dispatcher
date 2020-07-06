@@ -7,8 +7,7 @@ public class ErrorMessage {
     private Date timestamp;
     private String message;
     private int status;
-    private String field;
-    private String statusValue;
+    private String error;
 
     public ErrorMessage() {};
 
@@ -43,19 +42,11 @@ public class ErrorMessage {
         this.status = status;
     }
 
-    public void setStatusValue(String statusValue) {
-        this.statusValue = statusValue;
+    public void setError(String error) {
+        this.error = error;
     }
 
-    public String getStatusValue() {
-        return statusValue;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public String getField() {
-        return field;
+    public String getError() {
+        return error;
     }
 }

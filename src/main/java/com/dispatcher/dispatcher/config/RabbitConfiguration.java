@@ -27,7 +27,7 @@ public class RabbitConfiguration {
     private String password;
 
 
-    //настраиваем соединение с RabbitMQ
+    // настраиваем соединение с RabbitMQ
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitHost);
@@ -48,7 +48,7 @@ public class RabbitConfiguration {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setExchange(exchange);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        rabbitTemplate.setReplyTimeout(10000);
+        rabbitTemplate.setReplyTimeout(350000);
         return rabbitTemplate;
     }
 
