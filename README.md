@@ -17,7 +17,7 @@ ADD target/application.properties application.properties
 ADD target/dispatcher.jar dispatcher.jar  
 ENTRYPOINT ["java","-jar","dispatcher.jar"]
 
-**Link dockerhub** :  docker push denisdugin/dispatcher:2
+**Link dockerhub** :  docker push denisdugin/dispatcher:3
 
 RabbitMQ
 
