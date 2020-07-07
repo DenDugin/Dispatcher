@@ -26,16 +26,14 @@ public class MainController {
     private BlockingQueue<Integer> idQueue;
 
     public MainController() throws InterruptedException {
-
-        idQueue = new ArrayBlockingQueue<>(max_dispatcher);
-
+       idQueue = new ArrayBlockingQueue<>(max_dispatcher);
         for (int i=1; i<=max_dispatcher; i++)
             idQueue.put(i);
     }
 
 
     @PostMapping(value = "/dispatcher", consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<Integer> geMessage(@RequestBody String message) throws Exception {
+    public ResponseEntity<Integer> getMessage(@RequestBody String message) throws Exception {
 
         Integer id_dispt = idQueue.take();
 
@@ -54,7 +52,7 @@ public class MainController {
 // 3)   обычный метод отправки данных
 //        sender.sendToRabbitData(id_dispt, message);
 
-        logger.info("geMessage");
+        logger.info("getMessage");
 
         idQueue.put(id_dispt);
         return new ResponseEntity<Integer>(id_dispt, HttpStatus.OK);

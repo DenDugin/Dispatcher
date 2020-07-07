@@ -1,7 +1,7 @@
 package com.dispatcher.dispatcher.config;
 
 
-import com.dispatcher.dispatcher.exception.MyAsyncUncaughtExceptionHandler;
+import com.dispatcher.dispatcher.exception.AsyncExceptionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -35,7 +35,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new MyAsyncUncaughtExceptionHandler();
+        return new AsyncExceptionHandler();
     }
 
 
