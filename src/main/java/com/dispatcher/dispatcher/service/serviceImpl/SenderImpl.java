@@ -10,7 +10,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpConnectException;
-import org.springframework.amqp.AmqpIOException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +41,7 @@ public class SenderImpl implements Sender {
     @Value("#{${routKey.map}}")
     public ConcurrentHashMap<Integer,String> mapRoutKey;
 
-    private Logger logger =  LogManager.getLogger();
+    private Logger logger = LogManager.getLogger();
 
 
     private Message createMessageDispatcher(Integer id_dispt, String message) throws JsonProcessingException {
@@ -88,8 +87,8 @@ public class SenderImpl implements Sender {
         try {
             Message messageDispt = createMessageDispatcher(id_dispt,message);
             // Если необходим ответ от Executor-а :
-           //  Boolean response = (Boolean)template.convertSendAndReceive(mapRoutKey.get(messageDispt.getTarget_id()), messageDispt);
-           //  if (!response)  throw new ReceiveMessageException("Error from executor while receive message");
+           // Boolean response = (Boolean)template.convertSendAndReceive(mapRoutKey.get(messageDispt.getTarget_id()), messageDispt);
+           //  if (response == null || !response)  throw new ReceiveMessageException("Error from executor while receive message");
 
             // Send and forget
             template.convertAndSend(mapRoutKey.get(messageDispt.getTarget_id()), messageDispt);
