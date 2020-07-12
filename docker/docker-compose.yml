@@ -7,10 +7,17 @@ networks:
     driver: bridge
 
 services:
+  rabbitmq:
+    container_name: rabbit
+    image: 'denisdugin/myrabbitmq:latest'
+    networks:
+      - app-tier
 
   disp:
      container_name: dispatcher
      build: ./Dispatcher
+     depends_on:
+        - rabbitmq
      ports:
       - "8080:8080"
      image: dispatcher
@@ -19,12 +26,13 @@ services:
       - app-tier
 
 
-  java:
+  exec:
      container_name: executor
      volumes:
       - ./Save/id_1:/id_1
-      - ./Save/id_2:/id_2
      build: ./Executor
+     depends_on:
+        - rabbitmq
      ports:
       - "8081:8081"
      image: executor

@@ -15,7 +15,7 @@ ADD target/application.properties application.properties
 ADD target/dispatcher.jar dispatcher.jar  
 ENTRYPOINT ["java","-jar","dispatcher.jar"]
 
-**Link dockerhub** :  docker push denisdugin/dispatcher:3
+**Link dockerhub** :  docker push denisdugin/dispatcher:latest
 
 RabbitMQ
 
@@ -34,6 +34,9 @@ consumes = APPLICATION_XML_VALUE
 <client_id>345</client_id>
 </Message>
 ```
+
+Для запуска используется Docker Compose (/docker/docker-compose.yml)
+
 
 **Достоинства :**
 - Реализованы несколько типов доставки сообщений(синхронный и асинхронный).   
