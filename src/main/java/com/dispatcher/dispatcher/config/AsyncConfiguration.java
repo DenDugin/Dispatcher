@@ -5,6 +5,7 @@ import com.dispatcher.dispatcher.exception.AsyncExceptionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -20,7 +21,8 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     private static final Logger logger =  LogManager.getLogger();
 
-    private final int max_dispatcher = 100;
+    @Value("${server.tomcat.max-connections}")
+    private int max_dispatcher;
 
     @Bean
     public ExecutorService Executor() {

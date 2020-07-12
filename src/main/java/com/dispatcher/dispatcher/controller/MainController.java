@@ -5,10 +5,13 @@ import com.dispatcher.dispatcher.service.Sender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.PostConstruct;
 import java.util.concurrent.*;
 
 
@@ -21,15 +24,18 @@ public class MainController {
 
     private Logger logger =  LogManager.getLogger();
 
-    private final int max_dispatcher = 100;
+    @Value("${server.tomcat.max-connections}")
+    private int max_dispatcher;
 
     private BlockingQueue<Integer> idQueue;
 
-    public MainController() throws InterruptedException {
-       idQueue = new ArrayBlockingQueue<>(max_dispatcher);
+    @PostConstruct
+    void init() throws InterruptedException {
+        idQueue = new ArrayBlockingQueue<>(max_dispatcher);
         for (int i=1; i<=max_dispatcher; i++)
             idQueue.put(i);
     }
+
 
 
     @PostMapping(value = "/dispatcher", consumes = MediaType.APPLICATION_XML_VALUE)
@@ -37,11 +43,11 @@ public class MainController {
 
         Integer id_dispt = idQueue.take();
 
-// 1)        т.к. необходимо моментально принять и ответить на сообщение, то формируем пул потоков для создания заказа и отправки его исполнителю
+// 1)   т.к. необходимо моментально принять и ответить на сообщение, то формируем пул потоков для создания заказа и отправки его исполнителю
           sender.sendToRabbit(id_dispt, message);
 
 
-// 2)      Если необходим ответ от исполнителя или дождаться отправки сообщения исполнителю и затем отправить ответ клиенту
+// 2)   Если необходим ответ от исполнителя или дождаться отправки сообщения исполнителю и затем отправить ответ клиенту
 //         Future<Boolean> futureResult = sender.sendToRabbitAndWait(id_dispt, message);
 //        if (!futureResult.get()) {
 //            logger.info( "Message don't send");
